@@ -1,0 +1,72 @@
+class Matrix:
+    def __init__(self, n, m, v = 0):
+        self.n = n
+        self.m = m
+        self.l = [v] * (n*m)
+    
+    def __repr__(self):
+        i = ""
+        for n in range(self.n):
+            i += f"{self.l[n * self.m : n * self.m + self.m]}\n"
+        return i
+    
+    def __eq__(self, other):
+        return self.l == other.l and self.n == other.n
+    
+    def __setitem__(self, key, value):
+        n, m = key[0], key[1]
+        self.l[(n-1) * self.m + m - 1] = value
+        
+    def __getitem__(self, key):
+        return self.l[(key[0] - 1) * self.m + key[1] - 1]
+    
+    def __mul__(self, other):
+        if isinstance(other, Matrix) and self.m == other.n:
+            n_out = self.n
+            m_out = other.m
+            C = Matrix(n_out, m_out, 0)
+            for i in range(n_out):
+                for j in range(m_out):
+                    s = 0
+                    for k in range(self.m):
+                        s += self[i,k] * other[k,j]
+                    C[i,j] = s
+            return C
+        else:
+            for i in range(self.n**2):
+                self.l[i] *= other
+            return self
+        
+    def __rmul__(self, other):
+        return self*other
+        
+    def __neg__(self):
+        for i in range(self.n**2):
+            self.l[i] *= -1
+        return self
+    
+    def __add__(self, other):
+        for i in range(self.n**2):
+            self.l[i] += other.l[i]
+        return self
+    
+    def __sub__(self, other):
+        for i in range(self.n**2):
+            self.l[i] -= other.l[i]
+        return self
+    
+class SqMatrix(Matrix):
+    def __init__(self, n, v = 0):
+        super().__init__(n, n, v)
+        
+    def __pow__(self, n):
+        out = self
+        for i in range(n - 1):
+            out = out*self
+        return out
+        
+    def dlist(self):
+        l = list()
+        for i in range(self.n):
+            l.append(self[i,i])
+        return l
